@@ -1,5 +1,8 @@
 # One-Click Weather
+
 One-Click Weather is a really simple web app that lets you check the weather where you are.
+
+You can see the app live at: [grahammacphee.co.uk/weather](http://grahammacphee.co.uk/weather)
 
 ## Design
 
