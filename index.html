@@ -10,11 +10,11 @@
 
 <head>
 
-<title>One-Click Weather</title>
+<title>Weather</title>
 <meta name="author" content="Graham Macphee" />
 <meta name="description" content="One-Click Weather is a really simple web app that lets you check the weather where you are." />
 <meta name="keywords" content="One-Click Weather is a really simple web app that lets you check the weather where you are." />
-<meta name="theme-color" content="#333">
+<meta name="theme-color" content="#333333">
 <meta charset="utf-8">
 <meta property="og:title" content="One-Click Weather">
 <meta property="og:type" content="website">
@@ -23,8 +23,10 @@
 <meta property="og:description" content="One-Click Weather is a really simple web app that lets you check the weather where you are.">
 <meta property="twitter:account_id" content="87261538" /> <!-- Twitter ID, currently for @gmph -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="shortcut icon" href="https://36.media.tumblr.com/1788d0179016fecc207eb79071144fc5/tumblr_nkrkg9KKPS1qgct8oo5_r2_250.png">
-<link rel="icon" sizes="192x192" href="https://36.media.tumblr.com/1788d0179016fecc207eb79071144fc5/tumblr_nkrkg9KKPS1qgct8oo5_r2_250.png">
+<link rel="shortcut icon" href="https://40.media.tumblr.com/fdf294a6130a03cc9421a668bd886807/tumblr_nkrkg9KKPS1qgct8oo8_r1_250.png">
+<link rel="icon" sizes="192x192" href="https://40.media.tumblr.com/fdf294a6130a03cc9421a668bd886807/tumblr_nkrkg9KKPS1qgct8oo8_r1_250.png">
+<!--<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="http://dl.dropboxusercontent.com/u/17016249/ImportantWeatherJSON.json">-->
 <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400' rel='stylesheet' type='text/css'>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
@@ -75,12 +77,12 @@ body {
 
 .block {
 	width: 70%;
-	max-width: 700px;
+	max-width: 800px;
 	height:100px;
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	margin: -50px 0 0 -350px;
+	margin: -50px 0 0 -400px;
 }
 
 .block p {
@@ -150,7 +152,7 @@ span.reload:hover {
 	top:-5px;
 }
 
-@media(max-width:800px){
+@media(max-width:1000px){
 
 	body {
 		width: 100%;
@@ -167,7 +169,7 @@ span.reload:hover {
 		position: absolute;
 		top: 50vh;
 		left: 0;
-		margin: -115px 15% 0 15%;
+		margin: -100px 15% 0 15%;
 	}
 
 	.block p {
@@ -179,7 +181,7 @@ span.reload:hover {
 		display: block;
 		margin: 40px auto 0 auto;
 		padding:17px inherit;
-		box-shadow: 0 2px 8px rgba(0,0,0,.1);
+		box-shadow:none !important;
 
 	}
 
@@ -219,6 +221,8 @@ span.reload:hover {
 	$('body').css('opacity','0');
 	var animready = true;
 	// console.log('anim ready');
+
+	window.addEventListener("load", function() { window. scrollTo(0, 0); });
 
 	$(document).ready(function(){
 
@@ -294,7 +298,7 @@ span.reload:hover {
 			    unit: 'c',
 			    success: function(weather) {
 
-			      	setTemp(weather.temp,weather.city);
+			      	setTemp(weather.temp,weather.currently,weather.city);
 			    
 		    	},
 			    error: function(error) {
@@ -306,25 +310,33 @@ span.reload:hover {
 	}
 
 
-	function setTemp(tempInC,city){
-		var temp = tempInC; // randomInRange(-2,25);
-		if (temp < 9) {
-			temptext = "It's cold";
+	function capitalizeFirstLetter(string) {
+	    return string.charAt(0).toUpperCase() + string.slice(1);
+	}
+
+
+	function setTemp(tempInC,condition,city){
+		var temp = tempInC; // randomInRange(-18,36);
+		if (temp < 11) {
+			temptext = "It's cold, ";
 			tempcolor = "#7b68d9";
-		} else if ((temp >= 9) && (temp <= 14)){
-			temptext = "It's warm-ish";
+			headercolor = "#6954d4";
+		} else if ((temp >= 11) && (temp <= 16)){
+			temptext = "It's warm-ish, ";
 			tempcolor = "#de6e52";
+			headercolor = "#da5c3d";
 		} else {
-			temptext = "It's hot";
+			temptext = "It's hot, ";
 			tempcolor = "#d9536d";
+			headercolor = "#d43e5b";
 		}
 
-		reloadAnim(tempcolor);
+		reloadAnim(tempcolor,headercolor);
 
 		$('.block').css('opacity','0');
 
 		setTimeout(function(){
-			$('span.temp').html(temptext + "&nbsp;in " + city + ".&nbsp;" + temp + "&deg;C.<br class='moo'/>");
+			$('span.temp').html(/*temptext + */capitalizeFirstLetter((condition.replace('/',', ')).toLowerCase()) + "&nbsp;in " + city + ".&nbsp;" + temp + "&deg;C.<br class='moo'/>");
 				$('.block').css('opacity','1');
 		},400);
 	}
@@ -333,26 +345,34 @@ span.reload:hover {
 		$('.block').css('opacity','0');
 
 		setTimeout(function(){
-				$('span.temp').text("Oops! I can't get your location.");
-				$('.reload').text("Try again?");
+			$('span.temp').text("Oops! I can't get your location.");
+			$('.reload').text("Try again?");
 			$('.block').css('opacity','1');
 			$('.reload').css('opacity','1')
 		},400);
 	}
 
 
-	function reloadAnim(colorTo){
+	function reloadAnim(bodyTo,headerTo){
 
 		reloadpos = getCentreByID('reload');
 		setAbsPosByID('circle',reloadpos[0],reloadpos[1]);
 
-		$('#circle').css('background',colorTo).css('opacity','1');
+		$('#circle').css('background',bodyTo).css('opacity','1');
 		$('#circle').css('width','3000px').css('height','3000px');
 		$('#circle').css('margin','-1500px 0 0 -1500px');
+		
+		$('meta[name=theme-color]').remove();
+    	$('head').append( "<meta name='theme-color' content='"+headerTo+"''>" );
+
+		setTimeout(function(){
+    		
+    		$('body').css('background',bodyTo);
+
+    	},200);
 
     	setTimeout(function(){
-
-    		$('body').css('background',colorTo);
+    		
     		resetAnim();
 
     	},400);
